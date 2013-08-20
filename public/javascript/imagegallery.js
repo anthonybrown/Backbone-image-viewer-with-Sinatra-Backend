@@ -178,17 +178,19 @@ $(function(){
     ImageGallery.addImage(images);
   });
 
-  ImageGallery.vent.bind('image:selected', ImageGallery.showImage);
+  ImageGallery.vent.bind('image:selected', function(image) {
+    ImageGallery.showImage(image);
+    router.navigate('images/' + image.id);
+  });
 
   var imageListView = new ImageGallery.ImageListView({
     collection: images
   });
-
   imageListView.render();
 
   $('#image-list').html(imageListView.el);
 
-  new ImageGallery.Router({
+  var router = new ImageGallery.Router({
     collection: images
   });
   
