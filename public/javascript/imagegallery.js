@@ -109,6 +109,19 @@ ImageGallery.ImageView = Backbone.View.extend({
     }
 });
 
+ImageGallery.Router = Backbone.Router.extend({
+    routes: {
+      'images/:id': 'showImage'
+    }
+  , initialize: function (options) {
+      this.collection = options.collection;
+    }
+  , showImage: function (id) {
+      var image = this.collection.get(id);
+      ImageGallery.showImage(image); 
+    }
+});
+
 ImageGallery.addImage = function (images) {
   var image = new ImageGallery.Image();
   var addImageView = new ImageGallery.AddImageView({
@@ -174,5 +187,11 @@ $(function(){
   imageListView.render();
 
   $('#image-list').html(imageListView.el);
+
+  new ImageGallery.Router({
+    collection: images
+  });
   
+  Backbone.history.start();
+
 });
