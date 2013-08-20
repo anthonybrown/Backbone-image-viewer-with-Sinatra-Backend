@@ -2,6 +2,8 @@
    
   var ImageGallery = {};
 
+  ImageGallery.vent = _.extend({}, Backbone.Events);
+
   ImageGallery.Image = Backbone.Model.extend({
   });
   
@@ -43,13 +45,7 @@
           , desc = this.model.get('description')
           , url  = this.model.get('url');
 
-        // for testing
-        //var message = 'Name: ' + name + '\n';
-        //message += 'Description: ' + desc + '\n';
-        //message += 'Url: '+url;
-        
         this.collection.add(this.model);
-        //alert(message);
     }
     , render: function () {
         'use strict';
@@ -61,6 +57,19 @@
 ImageGallery.ImageListView = Backbone.View.extend({
     tagName: 'ul'
   , template: '#image-preview-template'
+
+  , events: {
+        'click a': 'imageClicked'
+    }
+
+  , imageClicked: function (e) {
+      "use strict";
+      e.preventDefault();
+      var id = $(e.currentTarget).data('id');
+      var image = this.collection.get(id);
+      // tell the app that the image was clicked
+      ImageGallery.vent.trigger('image:selected', image);
+    }
   
   , initialize: function () {
       'use strict';
@@ -79,6 +88,16 @@ ImageGallery.ImageListView = Backbone.View.extend({
 
 });
 
+ImageGallery.ImageView = Backbone.View.extend({
+    template: '#image-view-template'
+  , className: 'image-view'
+
+  , render: function () {
+      var html = $(this.template).tmpl(this.model.toJSON());
+      $(this.el).html(html);
+    }
+});
+
 ImageGallery.addImage = function (images) {
   var image = new ImageGallery.Image();
   var addImageView = new ImageGallery.AddImageView({
@@ -90,6 +109,14 @@ ImageGallery.addImage = function (images) {
   $('#main').html(addImageView.el);
 
 };
+
+ImageGallery.showImage = function (image) {
+  var imageView = new ImageGallery.ImageView({
+    model: image
+  });
+  imageView.render();
+  $('#main').html(imageView.el);
+}
 
 $(function(){
   'use strict';
@@ -122,11 +149,12 @@ $(function(){
 
   var images = new ImageGallery.ImageCollection(imageData);
   
-
   ImageGallery.addImage(images);
   images.bind('add', function () {
     ImageGallery.addImage(images);
   });
+
+  ImageGallery.vent.bind('image:selected', ImageGallery.showImage);
 
   var imageListView = new ImageGallery.ImageListView({
     collection: images
