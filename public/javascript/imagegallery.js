@@ -56,36 +56,47 @@
 
 ImageGallery.ImageListView = Backbone.View.extend({
     tagName: 'ul'
-  , template: '#image-preview-template'
-
-  , events: {
-        'click a': 'imageClicked'
-    }
-
-  , imageClicked: function (e) {
-      "use strict";
-      e.preventDefault();
-      var id = $(e.currentTarget).data('id');
-      var image = this.collection.get(id);
-      // tell the app that the image was clicked
-      ImageGallery.vent.trigger('image:selected', image);
-    }
   
   , initialize: function () {
       'use strict';
       _.bindAll(this, 'renderImage');
-      this.template = $(this.template);
       this.collection.bind('add', this.renderImage, this);
     }
   , renderImage: function (image) {
       'use strict';
-      var html = this.template.tmpl(image.toJSON());
-      $(this.el).prepend(html);
+      var imagePreview = new ImageGallery.ImagePreview({
+        model: image
+      });
+      imagePreview.render();
+      $(this.el).prepend(imagePreview.el);
     }
   , render: function () {
       this.collection.each(this.renderImage);
     }
 
+});
+
+ImageGallery.ImagePreview = Backbone.View.extend({
+    template: '#image-preview-template'
+
+  , events: {
+        'click a': 'imageClicked'
+    }
+
+  , initialize: function () {
+      this.template = $(this.template);
+    }
+
+  , imageClicked: function (e) {
+      "use strict";
+      e.preventDefault();
+      ImageGallery.vent.trigger('image:selected', this.model);
+    }
+
+  , render: function () {
+      var html = this.template.tmpl(this.model.toJSON());
+      $(this.el).html(html);
+    }
 });
 
 ImageGallery.ImageView = Backbone.View.extend({
