@@ -1,5 +1,6 @@
-/*jslint  sloppy: true, laxcomma: true, alert: true */
-   
+/*jslint -W109, -W108,  sloppy: true, laxcomma: true, alert: true, white : true, indent : false */
+/*global Backbone, _*/
+
   var ImageGallery = {};
 
   ImageGallery.vent = _.extend({}, Backbone.Events);
@@ -118,7 +119,7 @@ ImageGallery.Router = Backbone.Router.extend({
     }
   , showImage: function (id) {
       var image = this.collection.get(id);
-      ImageGallery.showImage(image); 
+      ImageGallery.showImage(image);
     }
 });
 
@@ -140,7 +141,7 @@ ImageGallery.showImage = function (image) {
   });
   imageView.render();
   $('#main').html(imageView.el);
-}
+};
 
 $(function(){
   'use strict';
